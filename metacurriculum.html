@@ -1,0 +1,47 @@
+<h1><center>Open AI Explorer</center></h1>
+<div id="instructions"><h3>Type in an incomplete sentence. OpenAI will provide 3 possible completions.</h3></div>
+<textarea  style="border: 0ch; height:70px; width:100%;font-family:arial" id="selectedchoice" onselect="highlightText()"></textarea>
+<div id="instr2"></div>
+<input style="font-size:18" type="text" size=80 id="myprompt"></input>
+<button onclick="getstuff()">Ask OpenAI...</button>
+<div id="results"></div>
+
+<script>
+oldprompt = ""
+function getstuff()
+{
+  window.api.send("toMainAI", document.getElementById("myprompt").value)
+  oldprompt = document.getElementById("myprompt").value
+  mydate = new Date().toISOString()
+  try{
+    datastring = "OPENAI," + mydate + "," + encodeURIComponent(document.getElementById ("myprompt").value) + "," + encodeURIComponent(document.getElementById("results").innerText) + "," + encodeURIComponent(document.getElementById("selectedchoice").value)
+  }
+  catch(e) {
+    datastring = "OPENAI," + mydate + "," + encodeURIComponent(document.getElementById ("myprompt").value) 
+  }
+  window.api.send ("toMainData", datastring + "\n");
+  document.getElementById ("results").innerHTML = "<h1>LOADING - PLEASE WAIT</h1><br>" + document.getElementById("myprompt").value
+}
+
+window.api.receive("fromMainAI", (data) => {
+  document.getElementById ("myprompt").value = ""
+  document.getElementById("results").innerHTML = data
+  document.getElementById ("instr2").innerHTML = "<h3>OpenAI completion for:" + oldprompt + "</h3>"
+  document.getElementById ("instructions").innerHTML = "<h2>Choose which option you are interested in, say WHY, and repeat your search...</h2><i>HINT: you can select text from below to copy parts of the response for the next search</i><p>"
+});
+
+function setselect (selected){
+  myselect = document.querySelector('input[name=\"group1\"]:checked').id; 
+  document.getElementById ('selectedchoice').innerText = document.getElementsByName('group1')[myselect].labels[0].innerText.substr(9)
+}
+
+let text_selection = document.getElementById("selectedchoice");
+
+
+function highlightText() {
+  console.log ("selected")
+  let textarea = event.target;
+  let selection = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+  document.getElementById("myprompt").value = selection
+}
+</script>

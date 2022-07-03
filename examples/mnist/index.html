@@ -1,0 +1,108 @@
+<!--
+Copyright 2018 Google LLC. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================
+-->
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-teal.min.css" />
+  </head>
+  <body>
+    <style>
+      #content {
+        padding: 15px;
+      }
+      canvas {
+        width: 200px;
+      }
+      .prediction-canvas{
+        width: 100px;
+      }
+      .pred {
+        font-size: 20px;
+        line-height: 25px;
+        width: 100px;
+      }
+      .pred-correct {
+        background-color: #00cf00;
+      }
+      .pred-incorrect {
+        background-color: red;
+      }
+      .pred-container {
+        display: inline-block;
+        width: 100px;
+        margin: 10px;
+      }
+      #lossCanvas > div, #accuracyCanvas > div {
+        display: none;
+      }
+      .canvases {
+        display: inline-block;
+        width: 460px;
+      }
+    </style>
+    <center>
+    <div id="content">
+      <h3>Image Recognition Using VGG16 Model</h3>
+      <div id="stats">
+        <div class="canvases">
+          <div class="label" id="loss-label"></div>
+          <div id="lossCanvas"></div>
+        </div>
+        <div class="canvases">
+          <div class="label" id="accuracy-label"></div>
+          <div id="accuracyCanvas"></div>
+        </div>
+      </div>
+
+      <div id="images"></div>
+    </div>
+    <script type="text/javascript" src="IMAGENETCLASSES.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+    <label>Image File:</label><br/>
+    <br>
+    <input type="file" id="imageLoader" name="imageLoader"/>
+    <canvas id="imageCanvas"></canvas>
+
+<script>
+    var imageLoader = document.getElementById('imageLoader');
+    imageLoader.addEventListener('change', handleImage, false);
+    var canvas = document.getElementById('imageCanvas');
+    var ctx = canvas.getContext('2d');
+
+
+    function handleImage(e){
+        var reader = new FileReader();
+        reader.onload = function(event){
+            var img = new Image();
+            img.onload = function(){
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img,0,0);
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);     
+    }
+</script>
+    <div id="prediction"></div>
+    <div id="predict-list"></div>
+    <button onclick = "getstuff()">predict</button>
+    <script src="index.js"></script>
+    </center>
+  </body>
+
+</html>

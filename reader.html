@@ -1,0 +1,299 @@
+<html>
+
+<head>
+  <meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+  <title>My Notes</title>
+  <link rel="stylesheet" href="node_modules/electron-tabs/electron-tabs.css">
+  <style>
+      /* As the tab needs to be in the border of the view, remove margin of the body tag */
+      body{
+          margin: 0;
+      }
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="pell.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .content {
+      box-sizing: border-box;
+      /* border: 5px solid red; */
+      margin: 0 auto;
+      max-width: 1000px;
+      padding: 20px;
+    }
+
+    #html-output {
+      white-space: pre-wrap;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <script>
+    window.api.receive("fromMainNotes", (data) => {
+        // console.log(`Received ${data} from main process`);
+        mypell = document.getElementsByClassName("pell-content")[0]
+        mypell.innerHTML = data
+    });
+
+  </script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <input  style="display:none" type="text" id="mydata" name="postdata">
+  <div class="content">
+    <h1>My Notes</h1>
+    <div id="editor" class="pell"></div>
+  </div>
+  <div style="display:none"  id="text-output"></div>
+  <!-- <div style="visibility:none"  id="html-output"></div>  -->
+  <center>
+    <div id="my_dataviz"></div>
+  </center>
+  <div id="hiddendiv" display="none"></div>
+  <textarea style="display:none" id="doccontents"></textarea>
+  <button style="display:none" onclick="getdoccontents()">get doc contents</button>
+  <script src='pell.js'></script>
+  <script>
+  typedtext = ""
+  document.getElementById("editor").addEventListener('keydown', function(event) {
+    typedtext = typedtext + String.fromCharCode(event.keyCode);
+    // console.log (String.fromCharCode(event.keyCode))
+  });
+
+  function removeTags(str) {
+      if ((str === null) || (str === ''))
+        return false;
+      else
+        str = str.toString();
+
+      return str.replace(/(<([^>]+)>)/ig, '');
+    }
+
+    var editor = window.pell.init({
+      element: document.getElementById('editor'),
+      defaultParagraphSeparator: 'p',
+      onChange: function (html) {
+        currenttext = removeTags(html)
+      }
+    })
+
+
+    document.getElementById("doccontents").value = document.getElementsByClassName("pell-content")[0].spellcheck=false
+    scrolllist = []
+    viewabletext = ""
+    function getdoccontents() {
+      document.getElementById("doccontents").value = document.getElementsByClassName("pell-content")[0].innerHTML
+    }
+    function addval(value) {
+      scrolllist.push(Math.round(value / 10))
+      document.getElementById("text-output").innerText = ""
+      mypell = document.getElementsByClassName("pell-content")[0].childNodes
+      console.log("********************************************")
+      for (i = 0; i < mypell.length; i++)
+        try {
+          if (mypell[i].getBoundingClientRect().y > 132 && mypell[i].getBoundingClientRect().y < 532)
+            document.getElementById("text-output").innerText = document.getElementById("text-output").innerText + mypell[i].textContent
+
+        }
+        catch (e) { }
+      viewabletext = document.getElementById("text-output").innerText
+    }
+
+  </script>
+
+    <script>
+    step = 0
+    mydata_A = []
+    mydata_B = []
+    scrollentropylist = []
+    textentropyarray = []
+    scrollmeanlist = []
+    viewtextlist = []
+    oldtext = ""
+    timearray = []
+    typedentropy = 0
+    currenttext = ""
+    mytextchunk = ""
+    oldviewabletext = ""
+    lastchunk = ""
+    myint = setInterval(chunkdata, 2000)
+    var entropy1 = 0
+    var entropy2 = 0
+
+    window.api.send ("SignalNote", "");
+    
+    function clickme()
+    {
+      window.api.send("toMain4", "some data");
+    }
+    function findDiff(str1, str2) {
+      let diff = "";
+      str2.split('').forEach(function (val, i) {
+        if (val != str1.charAt(i)) diff += val;
+      });
+      return diff;
+    }
+
+    function listmean(mylist) {
+      sum = 0
+      for (n = 0; n < mylist.length; n++) {
+        sum = sum + mylist[n]
+      }
+      // console.log ("mean: " + sum/mylist.length)
+      return (sum / mylist.length)
+    }
+
+
+    function chunkdata() {
+      let d = new Date().toISOString();
+      pushstr = "MYNOTE," + d + ","
+      step = step + 10
+      if (step > 1800)
+        shift = shift + 10
+      typedentropy = calcentropy (typedtext)
+      d3.selectAll("g > *").remove()
+      str1 = currenttext
+      // str2 = findDiff(oldtext, str1)
+      // oldtext = currenttext
+      document.getElementById('text-output').innerHTML = calcentropy(typedtext)
+      textentropyarray.push(typedtext)
+      timearray.push(calcentropy (typedtext))
+      pushstr = pushstr + typedentropy + ", "  
+      scrollentropylist.push(calcentropy(scrolllist))
+      pushstr = pushstr + calcentropy(scrolllist) + ","
+      scrollmeanlist.push(listmean(scrolllist))
+      pushstr = pushstr + encodeURIComponent (typedtext) + ","
+
+      if (oldviewabletext != viewabletext)
+      {
+        viewtextlist.push(viewabletext)
+        console.log ("viewable text different")
+        pushstr = pushstr + encodeURIComponent (viewabletext) + "\n"
+      }
+      else
+      {
+        viewtextlist.push ("")
+        pushstr = pushstr + "\n"
+      }
+      oldviewabletext = viewabletext
+      mydata_A.push({ "index": step, "value": calcentropy(currenttext) })
+
+      mydata_B.push({ "index": step, "value": calcentropy(scrolllist) })
+      var struct = {};
+      
+
+      // document.getElementById("mydata").value = JSON.stringify(paths, null, "\t");
+      // console.log (document.getElementById("mydata").value)
+      window.api.send ("toMainData", pushstr);
+      window.api.send ("toMainNotes", document.getElementsByClassName("pell-content")[0].innerHTML)      
+      draw(mydata_A, "green", 1.5, false)
+      draw(mydata_B, "red", 1.5, false)
+      typedtext = ""
+      scrolllist = []
+    }
+
+    shift = 0
+    // set the dimensions and margins of the graph
+    var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+      width = 1024 - margin.left - margin.right,
+      height = 150 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    //Read the data
+    // d3.csv("./data1.csv",
+    var mydata_A = Array()
+    var mydata_B = Array()
+
+
+    function draw(data, col, thick, stroke) {
+
+
+      var x = d3.scaleLinear()
+        .domain([0 + shift, 1822 + shift])
+        .range([0, width]);
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+
+      // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([0, 5])
+        .range([height, 0]);
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // Add the line
+      if (stroke == true)
+        svg.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", col)
+          .attr("stroke-width", thick)
+          .style("stroke-dasharray", ("3, 3"))
+          .attr("d", d3.line()
+            .x(function (d) { return x(d.index) })
+            .y(function (d) { return y(d.value) })
+          )
+      else
+        svg.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", col)
+          .attr("stroke-width", thick)
+          .attr("d", d3.line()
+            .x(function (d) { return x(d.index) })
+            .y(function (d) { return y(d.value) })
+          )
+    }
+
+    function calcentropy(t) {
+      //   t = document.getElementById ("mytext").value
+      // t = t.replace (/ /g, "~")
+      // document.getElementById ("mytext").value = t
+      myset = new Set(t)
+
+      // console.log ("set is: " + myset)
+      total = 0
+      myval = 0.0
+      for (let item of myset) {
+        mycount = countocc(t, item)
+        probx = mycount / t.length
+
+        if (probx != 1) {
+          myval = myval + probx * Math.log2(probx)
+        }
+        else
+          myval = myval + probx * 0
+      }
+
+      mystr = ""
+      return -myval
+    }
+
+    function countocc(haystack, needle) {
+      tot = 0
+      for (n = 0; n < haystack.length; n++) {
+        if (haystack[n] == needle) {
+          tot++;
+        }
+      }
+      return (tot)
+    }
+  </script>
+</body>
+
+</html>

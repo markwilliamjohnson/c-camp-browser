@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<style>
+  button {
+    display: block;
+    width: 130px;
+    height: 70px;
+    margin-left: 5px;
+    text-align: left;
+    background: #1172c2;
+    color: #fff;
+    font-size: 15px;
+    font-family: "Open Sans", sans-serif;
+    text-transform: Uppercase;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: blueviolet;
+  }
+</style>
+
+<head>
+  <title>C-Camp</title>
+
+</head>
+
+<body style="margin:0">
+  <div id="buttondiv" style="background-color: lightgray; width:150px; height: 100vh; border-left:10px solid #000;height:100vh"
+    width="10%">
+    <p></p>
+    <img src="c-campbg.jpg" width="150px">
+    <p>
+
+  </div>
+  <!-- <div id="description" style="position:absolute; top:0px; left:160px; height:100px"></div> -->
+
+  <script>
+    // currenttab = 0
+    // tabs = ["Tools", "Nature, AI and Decision", "Social Media and Relationships", "Art and Social Media", "Organisation and Data Privacy"]
+    // for (n = 0; n < tabs.length; n++) {
+    //   document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch' + n + '"  onclick="settab(' + n + ')">' + tabs[n] + '</button><p></p>';
+    // }
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_x" style="background:green" onclick="sendstuff()">OpenAI Text</button><p></p>';
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_y" style="background:green" onclick="testwebview()">Image Recognition</button><p></p>';
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_z" style="background:green"  onclick="openNotes()">My Notes App</button><p></p>';
+
+    function testwebview() {
+      window.api.send("toMain2", "")
+    }
+
+    function sendstuff() {
+      window.api.send("toMain", "some data")
+    }
+
+    function openNotes() {
+      window.api.send("toMain3", "")
+    }
+
+    // function settab(n) {
+    //   currenttab = n
+    //   for (x = 0; x < tabs.length; x++) {
+    //     if (x != n) {
+    //       document.getElementById("tab" + x).style.display = "none"
+    //       document.getElementById("switch" + x).style.background = "#1172c2";
+    //     }
+    //     else {
+    //       document.getElementById("description").innerHTML = "<h1>Current Tab: " + tabs[n]
+    //       document.getElementById("tab" + x).style.display = "block"
+    //       document.getElementById("switch" + x).style.background = "grey"
+    //     }
+    //   }
+    // }
+    function formatdate (mydate)
+    {
+      return (mydate.toISOString())
+    }
+
+  </script>
+
+  <!-- <div id="tabgroups">
+    <tab-group id="tab5" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab4" new-tab-button="false"
+      style="width:90%; height=90%; position:absolute; left:160px; top:10%; display:block" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab3" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab2" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab1" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab0" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+  </div>
+  <script src="electron-tabs.js"></script> -->
+  <script>
+    window.api.receive("fromMainSend", (data) => {
+      // alert (data)
+      requestIdleCallback(maketabs (data));
+    }
+
+    );
+    settab(0)
+
+  //   function maketabs(data)
+  //   {
+  //     srcarray = []
+  //     lines = data.split("\n")
+  //     setActive = false
+  //     oldtab = -1
+  //     for (t = 0; t < lines.length; t++) {
+  //       if (t > 0) {
+  //         bits = lines[t].split(",")
+  //         if (oldtab != bits[0]) {
+  //           // document.getElementById("tabgroups").innerHTML = document.getElementById("tabgroups").innerHTML + '<tab-group id="tab' + bits[0] + '" new-tab-button="false" style=" width:90%; height:90%; position:absolute; left:10%; top:10%; display:none" sortable="true"></tab-group>'
+  //           setActive = true
+  //           oldtab = bits[0]
+  //         }
+  //         else
+  //           setActive = false
+
+  //         tabadd = document.getElementById("tab" + bits[0])
+  //         tabadd.on("tab-active", (tab, tabGroup) => {
+  //           datastring = "TAB ACTIVE" + "," + tab.title + "," + formatdate(new Date()) + "\n"
+  //           window.api.send ("toMainData", datastring);
+  //            });
+  //         srcarray.push ({"tabno": bits[0], "title": bits[1], "src": bits[2]})
+  //         if (setActive == true)
+  //           mytab = tabadd.addTab({
+  //             title: bits[1],
+  //             src: bits[2],
+  //             closable: false,
+  //             active: true
+  //           }
+  //           )
+  //         else
+  //           mytab = tabadd.addTab({
+  //             title: bits[1],
+  //             src: bits[2],
+  //             closable: false
+  //           });
+  //       }
+  //     }
+  //   }
+  // </script>
+
+</body>
+
+</html>

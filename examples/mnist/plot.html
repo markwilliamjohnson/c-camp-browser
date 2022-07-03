@@ -1,0 +1,246 @@
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<p>
+    Here's a simple Plotly plot - 
+    <a href="https://bit.ly/1Or9igj">plotly.js documentation</a>
+</p>
+
+<!-- Plots go in blank <div> elements. 
+    You can size them in the plot layout,
+    or give the div a size as shown here.
+-->
+<div id="tester" style="width:90%;height:250px;"></div>
+
+
+<script>
+TESTER = document.getElementById('tester');
+
+Plotly.plot( TESTER, [{
+    x: [1, 2, 3, 4, 5],
+    y: [1, 2, 4, 8, 16] }, {
+    x: [1, 2, 3, 4, 5],
+    y: [4, 3, 4, 4, 1] }], { 
+    margin: { t: 0 } }, {showSendToCloud:true} );
+
+/* Current Plotly.js version */
+console.log( Plotly.BUILD );
+
+{
+    x: [1, 2, 3, 4, 5],
+    y: [1, 2, 4, 8, 16] }
+
+mport numpy as np
+import pandas as pd
+from itertools import combinations 
+import sys
+if sys.version_info[0] < 3: 
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
+# def combine(arr, s): 
+#     return list(combinations(arr, s)) 
+#     array = [21, 18, 19] 
+#     set = 2
+#     print(combine(array, set))
+
+def complementlist(rlist):
+    retlist = list()
+    for val in rlist:
+        if val == 0:
+            retlist.append (1)
+        else:
+            retlist.append (0)
+    return (retlist)
+
+function getrelativelist (rlist)
+{
+    oldval = -99
+    flist = list()
+    for val in rlist:
+        if oldval != -99:
+            if ((val - oldval) > 0):
+                bval = 1
+            else:
+                bval = 0
+            flist.append (bval)
+            
+        oldval = val
+    return (flist)
+}
+
+function getaggregatelist(columns, pmydf)
+{
+    retlist = list()
+    oldcollistval = list()
+#     print ("analysing length " + str(len (pmydf)))
+    for row in pmydf.iterrows():
+        collistval = list()
+        for col in columns:
+            collistval.append (row[1][col])
+        xsum = 0
+        for x in range (len(collistval)):
+            calclist = list()            
+            if len(oldcollistval) != 0:
+                calclist.append (oldcollistval[x] - collistval[x])
+#             print (collistval)
+#             print (calclist)
+            for val in calclist:
+                xsum = xsum - val
+        retlist.append (xsum)
+        oldcollistval = collistval
+    newlist = getrelativelist(retlist)
+#     print ("newlist length " + str(len (newlist)))
+    return (newlist)
+}
+
+function makebinary(pmydf,colnum)
+{  
+
+    collist = list()
+
+    for t in range (len (pmydf.columns)):
+        
+        collist.append (pmydf.columns.values[t])
+        
+#         collist.append (str(mydf.columns.values[t]) + "-neg")
+    
+    retlist = list(combinations(collist,colnum))
+    rellist = list()
+    retdf = pd.DataFrame()
+    oldcol = -99
+    for col in retlist:
+        if len (col) == 1:
+#             print (col[0])
+#             rellist = getrelativelist(pmydf [pmydf.columns.values[0])
+            rellist = getrelativelist(pmydf[col[0]])
+            retdf[col[0]] = rellist
+            retdf["not-" + str(col[0])] = complementlist(rellist)
+        else:
+#             for col2 in col:
+#                 print (col2)
+            rellist = getaggregatelist (col, pmydf)
+            retdf[col] = rellist
+            retdf["not-" + str(col)] = complementlist(rellist)
+    
+    return (retdf)   
+# first make pairs for each column
+#     for n in range (totdf.column)
+}
+
+import math
+
+function contains(small, big)
+{
+    count =0
+    for i in range(len(big)-len(small)+1):
+        for j in range(len(small)):
+            if big[i+j] != small[j]:
+                break
+        else:
+#             return i, i+len(small)-1
+            count=count + 1
+    return (count)
+}
+
+function calcentropy (mylist)
+{
+    myset = set (mylist)
+#     print ("set is: " + str(myset))
+    total = 0
+#    print ("len " + str (len(mylist)))
+    myval = 0.0
+    for row in myset:
+#        print ("row " + str(row))
+        probx = mylist.count(row)/len(mylist)
+#         print ("probability = " + str (mylist.count(int(row)))+ " divided by "+ str(len(mylist)))
+#         print ("prob: " + str(probx))
+        if (probx != 1):
+#             print (probx * math.log(2, probx))
+            myval = myval + probx * math.log(2,probx)
+            
+        else:
+            myval = myval + probx * 0
+    return (-myval)
+}
+
+function calcbarentropy (startbar, barlength, groupsize, intervallist)
+{
+    intarray = list()
+    if ((barlength + startbar) < len(intervallist)):
+        for z in range (startbar, barlength+startbar): 
+            intarray = intarray + intervallist[z]
+    else:
+        for z in range (startbar, len(intervallist)): 
+            intarray = intarray + intervallist[z]
+    
+    intcell = list()
+    for x in range (len(intarray)-groupsize):
+        intcell.append(str(intarray[x:x+groupsize]))
+#     print (intcell)
+    myset = set(intcell)
+    alphabet = list()
+    tempalph = list()
+    for t in myset:
+        t = t.replace ("['", "")
+        t = t.replace ("']", "")
+        t = t.replace ("[", "")
+        t = t.replace ("]", "")
+        t = t.replace (",", "")
+
+        tempalph = t.split()
+
+        tg = list()
+
+        for o in range(groupsize):
+            tg.append(int (tempalph[o]))
+        alphabet.append (tg)
+#     print ("set is: " + str(myset))
+    total = 0
+#     print (alphabet)
+#    print ("len " + str (len(mylist)))
+    myval = 1.0
+    if (intarray != []):
+        myval = 0.0
+        for row in alphabet:
+            print ("row " + str(row))
+            print (row)
+            print (mylist)
+            probx = contains (row, intarray)/len(intarray)
+#             print (probx)
+    #         print (probx)
+    #        print ("probability = " + str (mylist.count(int(row)))+ " divided by "+ str(len(mylist)))
+    #         print ("prob: " + str(probx))
+            try:
+                myval = myval + probx * math.log(2,probx)
+            except:
+                myval = myval + probx * 0
+    return (-myval)
+}
+function calclistentropy (alphabet, mylist)
+{
+    myset = alphabet
+#     print ("set is: " + str(myset))
+    total = 0
+#    print ("len " + str (len(mylist)))
+    myval = 1.0
+    if (mylist != []):
+        myval = 0.0
+        for row in myset:
+    #        print ("row " + str(row))
+    #         print (row)
+    #         print (mylist)
+            probx = contains (row, mylist)/len(mylist)
+    #         print (probx)
+    #        print ("probability = " + str (mylist.count(int(row)))+ " divided by "+ str(len(mylist)))
+    #         print ("prob: " + str(probx))
+            try:
+                myval = myval + probx * math.log(2,probx)
+            except:
+                myval = myval + probx * 0
+    return (-myval)
+}
+</script>

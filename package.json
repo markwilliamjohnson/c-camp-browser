@@ -1,0 +1,15 @@
+{
+  "name": "c-camp",
+  "description": "tools to support c-camp",
+  "main": "app.js",
+  "dependencies": {
+    "electron-packager": "^15.5.1",
+    "electron-prompt": "^1.7.0",
+    "electron-tabs": "^1.0.1",
+    "node-localstorage": "^2.2.1",
+    "node-static": "^0.7.11",
+    "openai": "^3.0.0",
+    "tfjs": "^0.6.0",
+    "v8-compile-cache": "^2.3.0"
+  }
+}

@@ -1,0 +1,23 @@
+<html>
+    <img src="3520.jpg" id="cat"></img>
+    <button onclick="getstuff()">get stuff</button>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script> 
+
+<script>
+
+const MODEL_URL = "model.json";
+
+let model;
+// For Keras use tf.loadLayersModel().
+(async function (){
+model = await tf.loadModel(MODEL_URL);
+console.log (model)
+})()
+
+function getstuff()
+{
+const cat = document.getElementById('cat');
+model.predict(tf.browser.fromPixels(cat));
+}
+</script>

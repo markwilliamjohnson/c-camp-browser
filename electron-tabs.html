@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<style>
+  button {
+    display: block;
+    width: 130px;
+    height: 70px;
+    margin-left: 5px;
+    text-align: left;
+    background: #1172c2;
+    color: #fff;
+    font-size: 15px;
+    font-family: "Open Sans", sans-serif;
+    text-transform: Uppercase;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+  button:hover {
+    background: blueviolet;
+  }
+</style>
+
+<head>
+  <title>C-Camp</title>
+
+</head>
+
+<body style="margin:0">
+  <div id="buttondiv" style="background-color: lightgray; width:150px; height: 100vh; border-left:10px solid #000;height:100vh"
+    width="10%">
+    <p></p>
+    <img src="c-campbg.jpg" width="150px">
+    <p>
+
+  </div>
+  <div id="description" class="grid-container" style="font-family:Arial, Helvetica, sans-serif; font-size:30px; background-color:lightcyan; position:absolute; top:18px; left:160px; width:90%; height:100px"></div>
+
+  <script>
+    currenttab = 0
+    g_urlstr = ""
+    g_tabtitle = ""
+    tabs = ["Tools", "Nature, AI and Decision", "Social Media and Relationships", "Art and Social Media", "Organisation and Data Privacy"]
+    for (n = 0; n < tabs.length; n++) {
+      document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch' + n + '"  onclick="settab(' + n + ')">' + tabs[n] + '</button><p></p>';
+    }
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_x" style="background:green" onclick="openOpenAI()">OpenAI Text</button><p></p>';
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_y" style="background:green" onclick="openImageRec()">Image Recognition</button><p></p>';
+    document.getElementById("buttondiv").innerHTML = document.getElementById("buttondiv").innerHTML + '<button id="switch_z" style="background:green"  onclick="openNotes()">My Notes App</button><p></p>';
+
+    function openImageRec() {
+      window.api.send("toMain2", "")
+    }
+
+    function openOpenAI() {
+      window.api.send("toMain", "some data")
+    }
+
+    function openNotes() {
+      window.api.send("toMain3", "")
+    }
+
+    function settab(n) {
+      currenttab = n
+      for (x = 0; x < tabs.length; x++) {
+        if (x != n) {
+          document.getElementById("tab" + x).style.display = "none"
+          document.getElementById("switch" + x).style.background = "#1172c2";
+        }
+        else {
+          g_tabtitle = document.getElementById ("tab"+n).tabs[0].title
+          g_urlstr = document.getElementById ("tab"+n).tabs[0].webview.src
+
+          document.getElementById("description").innerHTML = "<div class='grid-child purple' width=50%>&nbsp;&nbsp;&nbsp;&nbsp; Current Tab: " + tabs[n] + "</div><div class='grid-child green' width=50% style='font-family:Arial, Helvetica, sans-serif; font-size:20px;'>Title: " + g_tabtitle + "<br>URL: <input type='text' size=50 id='pageurl' value='" + g_urlstr + "'></input></div>"
+          document.getElementById("tab" + x).style.display = "block"
+          document.getElementById("switch" + x).style.background = "grey"
+        }
+      }
+    }
+    function formatdate (mydate)
+    {
+      return (mydate.toISOString())
+    }
+
+  </script>
+
+  <div id="tabgroups">
+    <tab-group id="tab5" 
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true" new-tab-button="false">
+    </tab-group>
+
+    <tab-group id="tab4" new-tab-button="false"
+      style="width:90%; height=90%; position:absolute; left:160px; top:10%; display:block" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab3" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab2" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab1" new-tab-button="false"
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true">
+    </tab-group>
+
+    <tab-group id="tab0" 
+      style=" width:90%; height:90%; position:absolute; left:160px; top:10%; display:none" sortable="true" new-tab-button=false>
+    </tab-group>
+  </div>
+  <script src="electron-tabs.js"></script>
+  <script>
+    window.api.receive("fromMainSend", (data) => {
+      // alert (data)
+      requestIdleCallback(maketabs (data));
+    }
+
+    );
+
+    // g_tabtitle = document.getElementById("tab0").tabs[0].title
+    // alert (g_tabtitle)
+    // g_urlstr = document.getElementById("tab0").tabs[0].urlstr
+    // settab(0)
+    function maketabs(data)
+    {
+      srcarray = []
+      lines = data.split("\n")
+      setActive = false
+      oldtab = -1
+      for (t = 0; t < lines.length; t++) {
+        if (t > 0) {
+          bits = lines[t].split(",")
+          if (oldtab != bits[0]) {
+            // document.getElementById("tabgroups").innerHTML = document.getElementById("tabgroups").innerHTML + '<tab-group id="tab' + bits[0] + '" new-tab-button="false" style=" width:90%; height:90%; position:absolute; left:10%; top:10%; display:none" sortable="true"></tab-group>'
+            setActive = true
+            oldtab = bits[0]
+          }
+          else
+            setActive = false
+
+          tabadd = document.getElementById("tab" + bits[0])
+          tabadd.on("tab-active", (tab, tabGroup) => {
+            datastring = "TAB ACTIVE" + "," + formatdate(new Date()) +"," + tab.title + "\n"
+            window.api.send ("toMainData", datastring);
+            settab (currenttab)
+             });
+          srcarray.push ({"tabno": bits[0], "title": bits[1], "src": bits[2]})
+          if (setActive == true)
+            mytab = tabadd.addTab({
+              title: bits[1],
+              src: bits[2],
+              closable: false,
+              active: true,
+              webviewAttributes: {
+                webpreferences: "allowRunningInsecureContent, disablewebsecurity",
+            webSecurity: false,
+            allowDisplayingInsecureContent: true,
+            allowRunningInsecureContent: true
+              }
+            }
+            
+            )
+          else
+            mytab = tabadd.addTab({
+              title: bits[1],
+              src: bits[2],
+              closable: false,
+              webviewAttributes: {
+                webpreferences: "allowRunningInsecureContent, disablewebsecurity",
+              nodeIntegration: false,
+            webSecurity: false,
+            allowDisplayingInsecureContent: true,
+            allowRunningInsecureContent: true
+              }
+
+            });
+        }
+      }
+    }
+  </script>
+
+</body>
+
+</html>
