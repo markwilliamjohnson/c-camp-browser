@@ -18,6 +18,7 @@ const fs = require("fs");
 require('v8-compile-cache');
 mainWindow = null;
 metacurriculum = null;
+mykey = ""
 
 app.whenReady().then(() => { 
   mainWindow = new electron.BrowserWindow({
@@ -82,13 +83,14 @@ ipcMain.on("toMainData", (event, data) =>
   g_data = data
   }
 });
-var mykey = ""
+
 
 ipcMain.on("toMain", (event, args) => 
 {
   mykey = ""
   if (fs.existsSync(path.join(app.getPath("userData"), "/openaikey.txt"))) {
     mykey = fs.readFileSync (path.join(app.getPath("userData"), "/openaikey.txt"), "utf-8")
+    openOpenAIWindow()
   }
   else
   {
@@ -110,15 +112,19 @@ ipcMain.on("toMain", (event, args) =>
           if (r!="")
           {
           fs.writeFileSync (path.join(app.getPath("userData"), "/openaikey.txt"), mykey)
+          openOpenAIWindow()
           }
       }
   })
   .catch(console.error);
   }
 
-if (mykey !="")  
+}
+);
+
+function openOpenAIWindow ()
 {
-// Load a remote URL
+  // Load a remote URL
 metacurriculum = new electron.BrowserWindow({
   modal:true,
   webPreferences: {
@@ -136,7 +142,6 @@ metacurriculum = new electron.BrowserWindow({
 metacurriculum.loadURL("file://" + __dirname + "/metacurriculum.html");
 metacurriculum.setAlwaysOnTop(true, 'screen');
 }
-});
 
 ipcMain.on("toMain2", (event, args) => 
 {
