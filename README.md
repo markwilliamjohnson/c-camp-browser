@@ -2,9 +2,9 @@
 
 
 To install:
-- cd c-camp-browser
-- npm install
-- npm install -g electron
+- type `cd c-camp-browser`
+- run `npm install`
+- run `npm install -g electron` to load electron
 
 To run:
-- electron .
+- type: `electron .`
